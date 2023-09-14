@@ -1,6 +1,6 @@
 <script>
   import {io} from 'socket.io-client'
-  const socket = io('http://localhost:3000');
+  const socket = io('https://backend-ttt.jonx.dev');
 
   export default {
     name: 'App',
@@ -18,6 +18,8 @@
         isTie: false,
 
         yourTurn: true,
+
+        lobbyfull: false,
 
         room: "",
       }
@@ -108,6 +110,7 @@
 
       JoinRoom(){
         socket.emit("joinGame", this.room);
+        this.lobbyfull = true;
       },
 
       CopyToClipboard(txt){
@@ -147,6 +150,16 @@
        this.room = _room;
       });
 
+      socket.on('userJoined', () => {
+        this.resetBoard();
+        this.lobbyfull = true;
+      });
+
+      socket.on('opponentLeft', () => {
+        this.resetBoard();
+        this.lobbyfull = false;
+      });
+
     },
   }
 </script>
@@ -171,7 +184,8 @@
 
   <div id="game" v-else>
     <p style="margin: 15px; position: absolute;" class="clickable" v-if="!singleplayer" @click="CopyToClipboard(room)">Room:{{ room }}</p>
-    <!--  https://dev.to/ayushmanbthakur/how-to-make-tic-tac-toe-in-browser-with-html-css-and-js-28ed-->
+    <p style="margin: 15px; position: absolute; right: 0;" v-if="!singleplayer && !lobbyfull">currently waiting for opponent</p>
+
     <div class="container unmarkable">
       <h1>Tic-Tac-Toe</h1>
       <div class="play-area">
@@ -183,7 +197,7 @@
         <div id="block_5" class="block" @click="draw(5)">{{ content[5] }}</div>
         <div id="block_6" class="block" @click="draw(6)">{{ content[6] }}</div>
         <div id="block_7" class="block" @click="draw(7)">{{ content[7] }}</div>
-        <div id="block_8" class="block" @click="draw(8)">{{ content[8] }}</div>
+        <div id="block_8" class="block" @click="draw(8)">{{ content[8] }}</div> 
       </div>
 
       <h2 id="winner" v-if="isOver"> Winner is {{winner}} </h2>

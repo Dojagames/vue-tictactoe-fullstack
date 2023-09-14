@@ -1,10 +1,13 @@
 const server = require('http').createServer();
 const io = require('socket.io')(server, {
     cors: {
-        origin: "http://127.0.0.1:5173",
+        origin: "https://ttt.jonx.dev/",
         methods: ["GET", "POST"]
     }
 });
+
+
+
 io.on('connection', (socket)=> {
     socket.emit("test", "testmsg");
 
@@ -43,13 +46,14 @@ io.on('connection', (socket)=> {
         if(adRooms.filter(e => e.name == id).length > 0){
             if(adRooms.filter(e => e.name == id)[0].users.length > 1){
                 socket.emit("cantJoinFull");
-            } else {
-                socket.join(id);
-                console.log(socket.id + " joined: " + id);
-                socket.emit("joined");
-                adRooms.filter(e => e.name == id)[0].users.push(socket.id);
-               
-            }
+                return;
+            } 
+
+            socket.join(id);
+            console.log(socket.id + " joined: " + id);
+            socket.to(id).emit("userJoined");
+            socket.emit("joined");
+            adRooms.filter(e => e.name == id)[0].users.push(socket.id);
         } else {
             socket.emit("cantJoinNotFound");
         }
@@ -57,8 +61,12 @@ io.on('connection', (socket)=> {
 
     socket.on("disconnecting", () => {
         const currentRoom = Array.from(socket.rooms)[1];
-        //send other player in room msg that player left
-        //delete id from room so other player can join
+        if(currentRoom == undefined) return;
+
+
+        io.to(adRooms.filter(e => e.name == currentRoom)[0].users.filter(f => f != socket.id)).emit("opponentLeft");
+        
+        adRooms.filter(e => e.name == currentRoom)[0].users = adRooms.filter(e => e.name == currentRoom)[0].users.filter(f => f == socket.id);
     });
 
 });
@@ -69,4 +77,4 @@ io.on('connection', (socket)=> {
 let adRooms = [];
 
 
-server.listen(3000);
+server.listen(3009);
