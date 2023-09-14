@@ -1,5 +1,5 @@
 # vue-tictactoe-fullstack
 
-##Uses
+## Uses
 Frontend: Vue Js
 Backend: Node js / Socket.io
