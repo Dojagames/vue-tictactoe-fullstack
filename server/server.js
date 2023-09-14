@@ -1,7 +1,7 @@
 const server = require('http').createServer();
 const io = require('socket.io')(server, {
     cors: {
-        origin: "https://ttt.jonx.dev/",
+        origin: "*",
         methods: ["GET", "POST"]
     }
 });
