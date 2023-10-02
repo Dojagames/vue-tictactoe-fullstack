@@ -1,6 +1,7 @@
-<script>
+F:\Environments\nodeJs<script>
   import {io} from 'socket.io-client'
-  const socket = io('https://backend-ttt.jonx.dev');
+  const socket = io('localhost:3009');
+  //test github
 
   export default {
     name: 'App',
